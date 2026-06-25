@@ -401,6 +401,11 @@ function renderPickerOverlay(step, selectedIdx) {
   }
 
   else if (step === 'login') {
+    // Si no hay PIN guardado todavía, ir a crear uno
+    if (!localStorage.getItem('pin_' + selectedIdx)) {
+      renderPickerOverlay('create-pin', selectedIdx);
+      return;
+    }
     const name = PLAYERS[selectedIdx];
     overlay.innerHTML = `
       <div class="picker-box">
@@ -1119,8 +1124,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (myPlayerIndex === null) {
       renderPickerOverlay('select');
     } else {
-      // Ya eligió jugador antes — pedir PIN
-      renderPickerOverlay('login', myPlayerIndex);
+      const hasPIN = localStorage.getItem('pin_' + myPlayerIndex) !== null;
+      if (hasPIN) {
+        renderPickerOverlay('login', myPlayerIndex);
+      } else {
+        // Tiene jugador pero no PIN — crear PIN
+        renderPickerOverlay('create-pin', myPlayerIndex);
+      }
     }
   }, 3800); // después del splash
   setInterval(() => { if (state.currentSection==='groups') renderMain(); }, 60000);
