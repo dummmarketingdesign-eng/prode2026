@@ -754,7 +754,12 @@ function renderMatchCard(match) {
   // PERO no puede cambiar pronósticos si ya hay resultado cargado (eso sería trampa)
   const locked = (result != null) || (!state.adminMode && timeLocked);
   const urgency    = !locked ? timeUntilLock(match) : null;
-  const timeStr    = match.kickoff_utc ? getArgTimeStr(match.kickoff_utc) : (match.date || '');
+  const _argD      = match.kickoff_utc ? getArgDate(match.kickoff_utc) : null;
+  const _dd        = _argD ? new Date(_argD + 'T12:00Z') : null;
+  const _dlabel    = _dd ? `${_dd.getUTCDate()}/${_dd.getUTCMonth()+1}` : '';
+  const timeStr    = match.kickoff_utc
+    ? `${_dlabel} ${getArgTimeStr(match.kickoff_utc)}`
+    : (match.date || '');
   const isFinal    = match.type === 'final';
   const homeVal    = (pred.home!==''&&pred.home!==undefined) ? pred.home : '';
   const awayVal    = (pred.away!==''&&pred.away!==undefined) ? pred.away : '';
