@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prode Mundial 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── SPLASH SCREEN ─────────────────────── -->
+  <div id="splash">
+
+    <!-- Flash entre slides -->
+    <div id="splash-flash"></div>
+
+    <!-- Slide 1: Rabbit -->
+    <div class="splash-slide active" id="s-rabbit">
+      <img src="rabbit.jpg" class="splash-img" alt="Rabbit">
+      <div class="splash-bottom" style="--player-color:#ea580c">
+        <div class="splash-tag">JUGADORA 2</div>
+        <div class="splash-player-name">RABBIT.6028148</div>
+      </div>
+      <div class="splash-bar" style="background:#ea580c"></div>
+    </div>
+
+    <!-- Slide 2: Marta -->
+    <div class="splash-slide" id="s-marta">
+      <img src="marta.jpg" class="splash-img" alt="Marta la Tarta">
+      <div class="splash-bottom" style="--player-color:#2563eb">
+        <div class="splash-tag">JUGADORA 1</div>
+        <div class="splash-player-name">MARTA LA TARTA</div>
+      </div>
+      <div class="splash-bar" style="background:#2563eb"></div>
+    </div>
+
+    <!-- Outro -->
+    <div class="splash-slide" id="s-outro">
+      <div class="splash-outro-inner">
+        <div class="splash-outro-ball">⚽</div>
+        <div class="splash-outro-prode">PRODE</div>
+        <div class="splash-outro-mundial">MUNDIAL 2026</div>
+        <div class="splash-outro-players">
+          <span style="color:#2563eb">MARTA LA TARTA</span>
+          <span class="vs-dot">·</span>
+          <span style="color:#ea580c">RABBIT.6028148</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- ── FIN SPLASH ─────────────────────────── -->
+
+  <header>
+    <div class="header-top">
+      <div class="logo">⚽ PRODE</div>
+      <div class="title">MUNDIAL 2026</div>
+      <div class="header-actions">
+        <button class="sync-btn sync-ok" id="sync-btn" onclick="syncNow()" title="Sincronizar">☁️</button>
+        <button class="sync-btn" onclick="changePlayer()" title="Cambiar jugador">👤</button>
+        <button class="admin-btn" id="admin-btn" onclick="toggleAdmin()" title="Modo Administrador">⚙</button>
+      </div>
+    </div>
+    <div class="player-switcher">
+      <button class="player-btn p1 active" id="btn-p0" onclick="switchPlayer(0)">Marta</button>
+      <button class="player-btn p2"        id="btn-p1" onclick="switchPlayer(1)">Rabbit</button>
+      <button class="player-btn p3"        id="btn-p2" onclick="switchPlayer(2)">Julieta</button>
+      <button class="player-btn p4"        id="btn-p3" onclick="switchPlayer(3)">Juanse</button>
+      <button class="player-btn p5"        id="btn-p4" onclick="switchPlayer(4)">Regi</button>
+      <button class="player-btn p6"        id="btn-p5" onclick="switchPlayer(5)">Fran</button>
+      <div class="header-pts" id="header-pts">0 pts</div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="nav-main">
+      <button class="nav-btn active" onclick="showSection('groups', this)">Grupos</button>
+      <button class="nav-btn" onclick="showSection('knockout', this)">Eliminatorias</button>
+      <button class="nav-btn" onclick="showSection('scoreboard', this)">Marcador</button>
+    </div>
+    <div class="group-tabs" id="group-tabs"></div>
+  </nav>
+
+  <main id="main-content"></main>
+
+  <footer>
+    <div class="points-legend">
+      <span class="leg leg-5">5 pts — Resultado exacto</span>
+      <span class="leg leg-3">3 pts — Ganador + diferencia de goles</span>
+      <span class="leg leg-1">1 pt — Solo ganador / empate</span>
+      <span class="leg leg-0">0 pts — Resultado incorrecto</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
