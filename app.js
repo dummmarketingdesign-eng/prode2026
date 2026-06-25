@@ -764,7 +764,7 @@ function renderMatchCard(match) {
       <div class="match-meta">
         ${match.group ? `<span class="group-badge">GR. ${match.group}</span>` : ''}
         ${match.label ? `<span class="match-label">${match.label}</span>` : ''}
-        <span class="match-time">${getArgDateLabel(match.kickoff_utc)} ${timeStr} ARG</span>
+        <span class="match-time">${timeStr} ARG</span>
         ${urgency          ? `<span class="urgency-badge">⏳ ${urgency}</span>` : ''}
         ${timeLocked&&!result ? `<span class="lock-badge">🔒 cerrado</span>` : ''}
         ${pts !== null     ? `<span class="match-pts ${pts_class(pts)}">${pts} pts</span>` : ''}
