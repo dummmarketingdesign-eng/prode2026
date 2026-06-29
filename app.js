@@ -685,16 +685,35 @@ async function pushToSupabase(data) {
         const rows = await readRes.json();
         if (rows.length > 0 && rows[0].data) {
           const remote = rows[0].data;
-          // Mergear: conservar predicciones remotas de otros jugadores
-          // solo actualizar las del jugador activo en este dispositivo
-          if (myPlayerIndex !== null) {
-            const merged = [...(remote.predictions || [])];
+          const remotePreds = remote.predictions || [];
+
+          if (state.adminMode) {
+            // Admin: mergear cada jugador individualmente
+            // local gana cuando tiene un valor, remote gana cuando local está vacío
+            const merged = PLAYERS.map((_, i) => {
+              const local  = data.predictions[i]   || {};
+              const rem    = remotePreds[i]         || {};
+              const result = { ...rem };
+              Object.entries(local).forEach(([k, v]) => {
+                if (v && v.home !== '' && v.away !== '') result[k] = v;
+              });
+              return result;
+            });
+            mergedData = {
+              ...remote,
+              predictions:   merged,
+              results:       data.results,
+              knockoutTeams: data.knockoutTeams,
+            };
+          } else if (myPlayerIndex !== null) {
+            // Jugador normal: solo actualizar su propio slot
+            const merged = [...remotePreds];
             while (merged.length < PLAYERS.length) merged.push({});
             merged[myPlayerIndex] = data.predictions[myPlayerIndex] || {};
             mergedData = {
-              ...remote,                        // base remota (resultados, knockoutTeams, etc.)
-              predictions:   merged,            // predicciones mergeadas
-              results:       data.results,      // resultados del admin (siempre los locales)
+              ...remote,
+              predictions:   merged,
+              results:       data.results,
               knockoutTeams: data.knockoutTeams,
             };
           }
