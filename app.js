@@ -641,16 +641,45 @@ function saveState() {
 async function pushToSupabase(data) {
   setSyncStatus('saving');
   try {
-    const res = await fetch(`${SB_URL}/rest/v1/prode_state`, {
+    // 1. Leer estado actual de Supabase para no pisar predicciones de otros jugadores
+    let mergedData = { ...data };
+    try {
+      const readRes = await fetch(
+        `${SB_URL}/rest/v1/prode_state?id=eq.${SB_ROW}&select=data`,
+        { headers: SB_HEADERS }
+      );
+      if (readRes.ok) {
+        const rows = await readRes.json();
+        if (rows.length > 0 && rows[0].data) {
+          const remote = rows[0].data;
+          // Mergear: conservar predicciones remotas de otros jugadores
+          // solo actualizar las del jugador activo en este dispositivo
+          if (myPlayerIndex !== null) {
+            const merged = [...(remote.predictions || [])];
+            while (merged.length < PLAYERS.length) merged.push({});
+            merged[myPlayerIndex] = data.predictions[myPlayerIndex] || {};
+            mergedData = {
+              ...remote,                        // base remota (resultados, knockoutTeams, etc.)
+              predictions:   merged,            // predicciones mergeadas
+              results:       data.results,      // resultados del admin (siempre los locales)
+              knockoutTeams: data.knockoutTeams,
+            };
+          }
+        }
+      }
+    } catch(e) { /* si falla la lectura, guardamos lo que tenemos */ }
+
+    // 2. Guardar estado mergeado
+    const saveRes = await fetch(`${SB_URL}/rest/v1/prode_state`, {
       method:  'POST',
       headers: { ...SB_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({
         id:         SB_ROW,
-        data:       data,
+        data:       mergedData,
         updated_at: new Date().toISOString(),
       }),
     });
-    setSyncStatus(res.ok ? 'ok' : 'error');
+    setSyncStatus(saveRes.ok ? 'ok' : 'error');
   } catch (e) {
     setSyncStatus('error');
     console.warn('Error guardando en Supabase:', e);
