@@ -842,9 +842,9 @@ function renderMatchCard(match) {
   const pts        = calculatePoints(match.id, p);
   const defined    = teamsSet(match);
   const timeLocked = isLocked(match);
-  // Admin puede editar pronósticos aunque haya pasado el tiempo límite
-  // PERO no puede cambiar pronósticos si ya hay resultado cargado (eso sería trampa)
-  const locked = (result != null) || (!state.adminMode && timeLocked);
+  // Admin puede editar pronósticos siempre (incluso con resultado para recuperar datos perdidos)
+  // Jugadores normales: bloqueados si hay resultado O si cerró el tiempo
+  const locked = !state.adminMode && ((result != null) || timeLocked);
   const urgency    = !locked ? timeUntilLock(match) : null;
   const _argD      = match.kickoff_utc ? getArgDate(match.kickoff_utc) : null;
   const _dd        = _argD ? new Date(_argD + 'T12:00Z') : null;
