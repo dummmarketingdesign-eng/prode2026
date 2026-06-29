@@ -4,6 +4,8 @@
 // ============================================
 
 const PLAYERS   = ['Marta la Tarta', 'Rabbit.6028148', 'Julieta', 'Juanse', 'Regi', 'Fran'];
+// Sanitize match IDs for use in HTML element IDs (remove spaces and special chars)
+const safeId = id => id.replace(/[^a-zA-Z0-9]/g, '_');
 const DAYS_ES   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
 // ── Argentina = UTC-3 ──────────────────────
@@ -863,21 +865,21 @@ function renderAdminRow(match, teams, result) {
         <label>Equipo local:</label>
         <input type="text" class="admin-team-input"
                placeholder="${teams.home}"
-               id="ath-${match.id}"
+               id="ath-${safeId(match.id)}"
                value="${(ko.home && ko.home !== 'Por definir') ? ko.home : ''}">
         <label>Visitante:</label>
         <input type="text" class="admin-team-input"
                placeholder="${teams.away}"
-               id="ata-${match.id}"
+               id="ata-${safeId(match.id)}"
                value="${(ko.away && ko.away !== 'Por definir') ? ko.away : ''}">
         <button class="admin-confirm-btn" onclick="saveKnockoutTeams('${match.id}')" title="Guardar equipos">✓</button>
       ` : ''}
       <label>Resultado:</label>
       <input type="number" min="0" max="30" inputmode="numeric" class="admin-score"
-             id="ares-h-${match.id}" value="${rHome}" placeholder="L">
+             id="ares-h-${safeId(match.id)}" value="${rHome}" placeholder="L">
       <span class="admin-sep">–</span>
       <input type="number" min="0" max="30" inputmode="numeric" class="admin-score"
-             id="ares-a-${match.id}" value="${rAway}" placeholder="V">
+             id="ares-a-${safeId(match.id)}" value="${rAway}" placeholder="V">
       <button class="admin-confirm-btn" onclick="submitResult('${match.id}')" title="Confirmar resultado">✓</button>
       ${result ? `<button class="admin-clear-btn" onclick="clearResult('${match.id}')" title="Borrar resultado">✗</button>` : ''}
     </div>
@@ -1118,8 +1120,8 @@ function savePrediction(matchId, side, value) {
 }
 
 function submitResult(matchId) {
-  const hEl = document.getElementById(`ares-h-${matchId}`);
-  const aEl = document.getElementById(`ares-a-${matchId}`);
+  const hEl = document.getElementById(`ares-h-${safeId(matchId)}`);
+  const aEl = document.getElementById(`ares-a-${safeId(matchId)}`);
   if (!hEl || !aEl) return;
 
   const home = parseInt(hEl.value);
@@ -1142,8 +1144,8 @@ function clearResult(matchId) {
 }
 
 function saveKnockoutTeams(matchId) {
-  const hEl = document.getElementById(`ath-${matchId}`);
-  const aEl = document.getElementById(`ata-${matchId}`);
+  const hEl = document.getElementById(`ath-${safeId(matchId)}`);
+  const aEl = document.getElementById(`ata-${safeId(matchId)}`);
   if (!hEl || !aEl) return;
 
   const home = hEl.value.trim() || 'Por definir';
