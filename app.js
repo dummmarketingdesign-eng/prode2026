@@ -541,6 +541,37 @@ function applyResult(match, homeScore, awayScore) {
   return true;
 }
 
+function findMatchByTeams(h, a) {
+  const norm = s => s ? s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : '';
+  // 1. Exacto en grupos
+  let m = MATCHES.find(x => x.home === h && x.away === a);
+  if (m) return { match: m, swapped: false };
+  // 2. Exacto en knockoutTeams
+  m = MATCHES.find(x => {
+    const kt = state.knockoutTeams[x.id];
+    return kt && kt.home === h && kt.away === a;
+  });
+  if (m) return { match: m, swapped: false };
+  // 3. Normalizado en grupos
+  m = MATCHES.find(x => norm(x.home) === norm(h) && norm(x.away) === norm(a));
+  if (m) return { match: m, swapped: false };
+  // 4. Normalizado en knockoutTeams
+  m = MATCHES.find(x => {
+    const kt = state.knockoutTeams[x.id];
+    return kt && norm(kt.home) === norm(h) && norm(kt.away) === norm(a);
+  });
+  if (m) return { match: m, swapped: false };
+  // 5. Invertido (la API puede invertir home/away)
+  m = MATCHES.find(x => x.home === a && x.away === h);
+  if (m) return { match: m, swapped: true };
+  m = MATCHES.find(x => {
+    const kt = state.knockoutTeams[x.id];
+    return kt && kt.home === a && kt.away === h;
+  });
+  if (m) return { match: m, swapped: true };
+  return null;
+}
+
 async function fetchAutoResults() {
   let updated = false;
   try {
@@ -549,14 +580,14 @@ async function fetchAutoResults() {
     const { matches } = await res.json();
     console.log('[API] partidos terminados:', matches?.length);
     (matches || []).forEach(m => {
-      // Nombres ya en español — match directo
-      const match = MATCHES.find(x =>
-        (x.home === m.home || x.home === m.hs) &&
-        (x.away === m.away || x.away === m.as)
-      );
-      if (!match) { console.warn('[API] sin match:', m.home, 'vs', m.away); return; }
-      if (applyResult(match, m.hg, m.ag)) {
-        console.log('[API] ✓', match.id, m.hg, '-', m.ag);
+      const found = findMatchByTeams(m.home, m.away)
+                 || findMatchByTeams(m.hs,   m.as);
+      if (!found) { console.warn('[API] sin match:', m.home, 'vs', m.away); return; }
+      const { match, swapped } = found;
+      const hg = swapped ? m.ag : m.hg;
+      const ag = swapped ? m.hg : m.ag;
+      if (applyResult(match, hg, ag)) {
+        console.log('[API] ✓', match.id, hg, '-', ag);
         updated = true;
       }
     });
