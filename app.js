@@ -290,17 +290,28 @@ function autoFillR32() {
   GROUPS.forEach(g => { standings[g]=getGroupStandings(g); });
 
   const best3rd = getBestThirdPlaceTeams();
-  const q3Groups = best3rd.map(t=>t.group);
-  const asgn    = assignThirdPlace(q3Groups);
-  if (!asgn) return { ok:false, msg:'Error calculando la asignación de 3ros.' };
+
+  // Asignación FIJA del bracket oficial FIFA 2026
+  // Cada slot de "3er mejor" tiene asignado un grupo específico
+  const FIXED_3RD = {
+    'E': 'D',  // 1E (Alemania)   vs 3D (Paraguay)
+    'I': 'F',  // 1I (Francia)    vs 3F (Suecia)
+    'A': 'E',  // 1A (México)     vs 3E (Ecuador)
+    'L': 'K',  // 1L (Inglaterra) vs 3K (R.D. Congo)
+    'G': 'I',  // 1G (Bélgica)   vs 3I (Senegal)
+    'D': 'B',  // 1D (EE.UU.)     vs 3B (Bosnia)
+    'B': 'J',  // 1B (Suiza)      vs 3J (Argelia)
+    'K': 'L',  // 1K (Colombia)   vs 3L (Ghana)
+  };
 
   // Resuelve un slot a nombre de equipo
   function resolve(slot) {
     if (slot.t==='w') return standings[slot.g][0]?.name || 'Por definir';
     if (slot.t==='r') return standings[slot.g][1]?.name || 'Por definir';
     if (slot.t==='t') {
-      const g3 = asgn[slot.wg];
-      return best3rd.find(t=>t.group===g3)?.name || 'Por definir';
+      const g3 = FIXED_3RD[slot.wg];
+      if (!g3) return 'Por definir';
+      return standings[g3]?.[2]?.name || best3rd.find(t=>t.group===g3)?.name || 'Por definir';
     }
     return 'Por definir';
   }
